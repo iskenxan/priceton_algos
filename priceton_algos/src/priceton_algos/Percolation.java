@@ -1,51 +1,99 @@
 package priceton_algos;
 
-import java.util.ArrayList;
 
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 	private int n;
 	private int openSites=0;
-	ArrayList<Boolean> isOpen;
-	WeightedQuickUnionUF quickUnion;
+	private int virtualTopSite=n*n;
+	private int virtualBottomSite=n*n+1;
+	
+	private boolean [][] isOpen;
+	private WeightedQuickUnionUF quickUnion;
 
 	public Percolation(int n) {
 		this.n = n;
 		if (n <= 0)
 			throw new IllegalArgumentException();
 
-		isOpen = new ArrayList<Boolean>();
-		for (int i = 0; i < n * n; i++) {
-			isOpen.add(false);
-		}
-		quickUnion = new WeightedQuickUnionUF(n * n);
+		isOpen = new boolean[n][n];
+		
+		quickUnion = new WeightedQuickUnionUF(n * n+2);
 	}
+	
 
 	public void open(int row, int col) {
-		openSites++;
 		validate(row, col);
-
+		openSites++;
+		if(row==1) {
+			quickUnion.union(col-1, virtualTopSite);
+		}
+		
+		int index=xyTo1D(row,col);
+		isOpen[row-1][col-1]=true;
+		connectToLeftCell(row,col,index);
+		connectToTopCell(row, col, index);
+		connectToRightCell(row,col,index);
+		connectToBottomCell(row,col,index);
+	}
+	
+	
+	
+	private void connectToLeftCell(int row, int col,int index) {
+		if(col>1&&isOpen(row,col-1)) {
+			int leftIndex=xyTo1D(row,col-1);
+			quickUnion.union(leftIndex, index);
+		}
 	}
 
+	
+	private void connectToTopCell(int row, int col, int index) {
+		if(row>1&&isOpen(row-1,col)) {
+			int topIndex=xyTo1D(row-1,col);
+			quickUnion.union(topIndex, index);
+		}
+	}
+	
+	
+	private void connectToRightCell(int row, int col, int index) {
+		if(col+1<n&&isOpen(row,col+1)) {
+			int rightIndex=xyTo1D(row,col+1);
+			quickUnion.union(rightIndex, index);
+		}
+	}
+	
+	
+	private void connectToBottomCell(int row, int col, int index) {
+		if(row+1<n&&isOpen(row+1,col)) {
+			int rightIndex=xyTo1D(row+1,col);
+			quickUnion.union(rightIndex, index);
+		}
+	}
+	
+	
 	public boolean isOpen(int row, int col) {
-		int index = xyTo1D(row, col);
+		validate(row,col);
 
-		return isOpen.get(index);
+		return isOpen[row-1][col-1];
 	}
 
+	
 	public boolean isFull(int row, int col) {
-		return false;
+		int index= xyTo1D(row,col);
+		boolean isConnectedToTop=quickUnion.connected(index, virtualTopSite);
+		return isConnectedToTop;
 	}
+	
 
 	public int numberOfOpenSites() {
-		return 0;
+		return openSites;
 	}
 
 	public boolean percolates() {
-		return false;
+		boolean bottomConnectToTop=quickUnion.
+				connected(virtualTopSite, virtualBottomSite);
+		return bottomConnectToTop;
 	}
 
 	private int xyTo1D(int row, int column) {
@@ -63,6 +111,5 @@ public class Percolation {
 	}
 
 	public static void main(String[] args) {
-
 	}
 }
