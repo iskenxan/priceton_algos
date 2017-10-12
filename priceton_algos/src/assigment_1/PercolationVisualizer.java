@@ -1,4 +1,4 @@
-package priceton_algos;
+package assigment_1;
 
 /******************************************************************************
  *  Compilation:  javac PercolationVisualizer.java
