@@ -1,4 +1,3 @@
-package assigment_2;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -13,7 +12,7 @@ public class Deque<Item> implements Iterable<Item> {
 	}
 
 	public boolean isEmpty() {
-		return first == null;
+		return size==0;
 	}
 
 	public int size() {
@@ -27,10 +26,12 @@ public class Deque<Item> implements Iterable<Item> {
 		first.value = item;
 		first.next = oldFirst;
 		first.previous = null;
-		oldFirst.previous = first;
+		
 		size++;
 		if (size == 1)
 			last = first;
+		else
+			oldFirst.previous = first;
 	}
 
 	public void addLast(Item item) {
@@ -39,11 +40,13 @@ public class Deque<Item> implements Iterable<Item> {
 		newLast.value = item;
 		newLast.next = null;
 		newLast.previous = last;
-		last.next = newLast;
-		last = newLast;
+		
 		size++;
 		if (size == 1)
 			first = last;
+		else
+			last.next = newLast;
+		last = newLast;
 	}
 
 	private void throwIfNull(Item item) {
@@ -55,8 +58,12 @@ public class Deque<Item> implements Iterable<Item> {
 		throwIfEmpty();
 		Item value = first.value;
 		first = first.next;
-		first.previous = null;
 		size--;
+		if(isEmpty())
+			last=null;
+		else
+			first.previous = null;
+		
 		return value;
 	}
 
@@ -64,8 +71,12 @@ public class Deque<Item> implements Iterable<Item> {
 		throwIfEmpty();
 		Item value = last.value;
 		last = last.previous;
-		last.next = null;
 		size--;
+		if(isEmpty())
+			first=null;
+		else
+			last.next = null;
+		
 
 		return value;
 	}
